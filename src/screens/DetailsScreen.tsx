@@ -3,6 +3,7 @@ import { StackNavigationProp } from '@amazon-devices/react-navigation__stack';
 import isEqual from 'lodash/isEqual';
 import React from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
+import { TVFocusGuideView } from '@amazon-devices/react-native-kepler';
 import { ActionButtons } from '../components/details/ActionButtons';
 import { DetailHeader } from '../components/details/DetailHeader';
 import { RelatedMoviesSection } from '../components/details/RelatedMoviesSection';
@@ -64,20 +65,24 @@ const DetailsScreen = ({
           onBackIconBlur={onBackIconBlur}
         />
         <View style={styles.content}>
-          <ActionButtons
-            buttonConfig={buttonConfig}
-            playMovieButtonRef={playMovieButtonRef}
-            onBlurPlayMovie={onBlurPlayMovie}
-            onPlayMovieFocus={onPlayMovieFocus}
-          />
+          <TVFocusGuideView autoFocus>
+            <ActionButtons
+              buttonConfig={buttonConfig}
+              playMovieButtonRef={playMovieButtonRef}
+              onBlurPlayMovie={onBlurPlayMovie}
+              onPlayMovieFocus={onPlayMovieFocus}
+            />
+          </TVFocusGuideView>
           <RentalInfo {...rentalInfo} />
           <VideoFileType selectedFileType={format} />
-          <RelatedMoviesSection
-            loading={loading}
-            relatedData={relatedData}
-            cardDimensions={cardDimensions}
-            heading="Related Movies:"
-          />
+          <TVFocusGuideView autoFocus trapFocusRight trapFocusLeft>
+            <RelatedMoviesSection
+              loading={loading}
+              relatedData={relatedData}
+              cardDimensions={cardDimensions}
+              heading="Related Movies:"
+            />
+          </TVFocusGuideView>
         </View>
       </ImageBackground>
     </View>

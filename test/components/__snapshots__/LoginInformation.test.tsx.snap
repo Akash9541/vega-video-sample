@@ -74,10 +74,10 @@ exports[`LoginInformation renders SettingsScreen correctly and matches snapshot 
         {
           "backgroundColor": "#2D61FF",
           "borderColor": "transparent",
-          "borderRadius": 8,
-          "borderWidth": 3,
-          "height": 76,
-          "paddingHorizontal": 18,
+          "borderRadius": 10,
+          "borderWidth": 3.5,
+          "height": 94,
+          "paddingHorizontal": 22,
         },
         {
           "backgroundColor": "transparent",
@@ -122,7 +122,7 @@ exports[`LoginInformation renders SettingsScreen correctly and matches snapshot 
               {
                 "color": "#FFFFFF",
                 "fontFamily": "Amazon Ember",
-                "fontSize": 22,
+                "fontSize": 27,
                 "fontWeight": "700",
               },
               {

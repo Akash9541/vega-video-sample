@@ -19,11 +19,11 @@ exports[`LocaleComponent calls onSelect with the correct option when the button 
         {
           "color": "#FFFFFF",
           "fontFamily": "Amazon Ember",
-          "fontSize": 32,
+          "fontSize": 39.5,
           "fontStyle": undefined,
           "fontWeight": "600",
           "letterSpacing": undefined,
-          "lineHeight": 40,
+          "lineHeight": 49.5,
           "marginRight": 20,
         }
       }
@@ -76,11 +76,11 @@ exports[`LocaleComponent renders correctly with styles 1`] = `
         {
           "color": "#FFFFFF",
           "fontFamily": "Amazon Ember",
-          "fontSize": 32,
+          "fontSize": 39.5,
           "fontStyle": undefined,
           "fontWeight": "600",
           "letterSpacing": undefined,
-          "lineHeight": 40,
+          "lineHeight": 49.5,
           "marginRight": 20,
         }
       }
