@@ -41,11 +41,11 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
           {
             "color": "#FFFFFF",
             "fontFamily": "Amazon Ember",
-            "fontSize": 32,
+            "fontSize": 39.5,
             "fontStyle": undefined,
             "fontWeight": "600",
             "letterSpacing": undefined,
-            "lineHeight": 40,
+            "lineHeight": 49.5,
             "marginRight": 20,
           }
         }
@@ -151,7 +151,7 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
               "fontStyle": undefined,
               "fontWeight": "400",
               "letterSpacing": undefined,
-              "lineHeight": 40,
+              "lineHeight": 49.5,
               "margin": 10,
               "marginVertical": 2,
             }
@@ -236,10 +236,10 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
           {
             "backgroundColor": "#2D61FF",
             "borderColor": "transparent",
-            "borderRadius": 8,
-            "borderWidth": 3,
-            "height": 76,
-            "paddingHorizontal": 18,
+            "borderRadius": 10,
+            "borderWidth": 3.5,
+            "height": 94,
+            "paddingHorizontal": 22,
           },
           {
             "backgroundColor": "transparent",
@@ -284,7 +284,7 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
                 {
                   "color": "#FFFFFF",
                   "fontFamily": "Amazon Ember",
-                  "fontSize": 22,
+                  "fontSize": 27,
                   "fontWeight": "700",
                 },
                 {
@@ -618,10 +618,10 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
           {
             "backgroundColor": undefined,
             "borderColor": "#727477",
-            "borderRadius": 8,
-            "borderWidth": 3,
-            "height": 76,
-            "paddingHorizontal": 18,
+            "borderRadius": 10,
+            "borderWidth": 3.5,
+            "height": 94,
+            "paddingHorizontal": 22,
           },
           {
             "backgroundColor": "transparent",
@@ -667,7 +667,7 @@ exports[`Setting Test Cases renders SettingScreen correctly and matches snapshot
                 {
                   "color": "#727477",
                   "fontFamily": "Amazon Ember",
-                  "fontSize": 22,
+                  "fontSize": 27,
                   "fontWeight": "700",
                 },
                 {
