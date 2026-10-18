@@ -1,0 +1,339 @@
+{
+  "algorithmVersion": "1.1.0",
+  "evaluationVersion": 1,
+  "note": "Synthetic screening evaluation only; not a real-world accuracy or safety validation.",
+  "results": [
+    {
+      "actualCueTypes": [
+        "candidate_flashing_pattern"
+      ],
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 4.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6863,
+              -0.9922,
+              0.9922,
+              -0.9922,
+              0.9922,
+              -0.9922,
+              0.9922,
+              -0.9922,
+              0.9922,
+              -0.9922,
+              0.3059
+            ],
+            "directionReversals": 10,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.2,
+              2.4,
+              2.6,
+              2.8,
+              3.0,
+              3.2,
+              3.4,
+              3.6,
+              3.8,
+              4.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "detectedExpected": true,
+      "expected": "candidate_flashing_pattern",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "repeat_reference",
+      "intervalMetrics": {
+        "detected": [
+          1.933,
+          4.0
+        ],
+        "endErrorSeconds": 0.0,
+        "groundTruth": [
+          2.0,
+          4.0
+        ],
+        "intersectionOverUnion": 0.9676,
+        "startErrorSeconds": -0.067
+      },
+      "missed": false
+    },
+    {
+      "actualCueTypes": [
+        "candidate_brightness_change"
+      ],
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 3.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.702
+            ],
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              3.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 2.933,
+          "type": "candidate_brightness_change"
+        }
+      ],
+      "detectedExpected": true,
+      "expected": "candidate_brightness_change",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "single_transition",
+      "missed": false,
+      "transitionComparison": {
+        "absoluteErrorsSeconds": [
+          0.0
+        ],
+        "detectedSeconds": [
+          3.0
+        ],
+        "expectedSeconds": [
+          3.0
+        ]
+      }
+    },
+    {
+      "actualCueTypes": [],
+      "cues": [],
+      "detectedExpected": true,
+      "expected": "no_candidate",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "gradual_ramp",
+      "missed": false
+    },
+    {
+      "actualCueTypes": [],
+      "cues": [],
+      "detectedExpected": true,
+      "expected": "no_candidate",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "stable_gray",
+      "missed": false
+    },
+    {
+      "actualCueTypes": [
+        "candidate_brightness_change",
+        "candidate_brightness_change",
+        "candidate_brightness_change"
+      ],
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 2.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6275
+            ],
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_brightness_change"
+        },
+        {
+          "action": "review",
+          "endSeconds": 4.0,
+          "evidence": {
+            "brightnessDifferences": [
+              -0.5471
+            ],
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              4.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 3.933,
+          "type": "candidate_brightness_change"
+        },
+        {
+          "action": "review",
+          "endSeconds": 6.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.4706
+            ],
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              6.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 5.933,
+          "type": "candidate_brightness_change"
+        }
+      ],
+      "detectedExpected": false,
+      "expected": "no_candidate",
+      "falsePositive": true,
+      "falsePositiveKinds": [
+        "candidate_brightness_change",
+        "candidate_brightness_change",
+        "candidate_brightness_change"
+      ],
+      "id": "ordinary_scene_cuts",
+      "missed": false,
+      "transitionComparison": {
+        "absoluteErrorsSeconds": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "detectedSeconds": [
+          2.0,
+          4.0,
+          6.0
+        ],
+        "expectedSeconds": [
+          2.0,
+          4.0,
+          6.0
+        ]
+      }
+    },
+    {
+      "actualCueTypes": [
+        "candidate_flashing_pattern"
+      ],
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 6.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6314,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.2314
+            ],
+            "directionReversals": 8,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.533,
+              3.0,
+              3.533,
+              4.0,
+              4.533,
+              5.0,
+              5.533,
+              6.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "detectedExpected": true,
+      "expected": "candidate_flashing_pattern",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "slow_alternation",
+      "intervalMetrics": {
+        "detected": [
+          1.933,
+          6.0
+        ],
+        "endErrorSeconds": 0.0,
+        "groundTruth": [
+          2.0,
+          6.0
+        ],
+        "intersectionOverUnion": 0.9835,
+        "startErrorSeconds": -0.067
+      },
+      "missed": false
+    },
+    {
+      "actualCueTypes": [
+        "candidate_flashing_pattern"
+      ],
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 2.8,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6314,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.2314
+            ],
+            "directionReversals": 4,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.2,
+              2.4,
+              2.6,
+              2.8
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "detectedExpected": true,
+      "expected": "candidate_flashing_pattern",
+      "falsePositive": false,
+      "falsePositiveKinds": [],
+      "id": "short_alternation",
+      "intervalMetrics": {
+        "detected": [
+          1.933,
+          2.8
+        ],
+        "endErrorSeconds": 0.0,
+        "groundTruth": [
+          2.0,
+          2.8
+        ],
+        "intersectionOverUnion": 0.9227,
+        "startErrorSeconds": -0.067
+      },
+      "missed": false
+    }
+  ],
+  "summary": {
+    "binaryAnyCandidate": {
+      "falseNegatives": 0,
+      "falsePositives": 1,
+      "precision": 0.8,
+      "recall": 1.0,
+      "trueNegatives": 2,
+      "truePositives": 4
+    },
+    "clips": 7,
+    "expectedOutcomeMatches": 6,
+    "falsePositiveCandidates": 3,
+    "falsePositiveClips": 1,
+    "missedExpectedClips": 0
+  }
+}

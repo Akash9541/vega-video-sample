@@ -89,9 +89,6 @@ export class ShakaPlayer implements PlayerInterface {
       // license server URL.
       if (response.headers['x-uplynk-prefix']) {
         this.lastUplynkPrefix = response.headers['x-uplynk-prefix'];
-        console.log(
-          `sample:shaka: in the response filter update Prefix to ${this.lastUplynkPrefix}`,
-        );
       } else {
         this.lastUplynkPrefix = '';
       }
@@ -317,9 +314,6 @@ export class ShakaPlayer implements PlayerInterface {
       let header_map: Map<string, string> = new Map();
 
       content.drm_license_header.map((values) => {
-        console.log(
-          `sample:shaka: got License header TAG: ${values[0]} DATA: ${values[1]}`,
-        );
         header_map.set(values[0] as string, values[1] as string);
       });
 
@@ -336,9 +330,6 @@ export class ShakaPlayer implements PlayerInterface {
       let header_map: Map<string, string> = new Map();
 
       content.manifest_header.map((values) => {
-        console.log(
-          `sample:shaka: got Manifest header TAG: ${values[0]} DATA: ${values[1]}`,
-        );
         header_map.set(values[0] as string, values[1] as string);
       });
 
@@ -406,9 +397,7 @@ export class ShakaPlayer implements PlayerInterface {
 
     // Separating the drm configuration since Shaka seems to call drm operations even if they are not needed when drm configuration is present.
     if (content.drm_scheme !== null && content.drm_scheme !== '') {
-      console.log(
-        `shakaplayer: loading with ${content.drm_scheme} and ${content.drm_license_uri} and ${content.secure}`,
-      );
+      console.log('shakaplayer: configuring DRM for adaptive media');
       let signal_secure: string = 'SW_SECURE_CRYPTO';
       let audio_not_secure: string = 'SW_SECURE_CRYPTO';
       if (content.drm_scheme === 'com.microsoft.playready') {
@@ -423,9 +412,7 @@ export class ShakaPlayer implements PlayerInterface {
         }
       }
 
-      console.log(
-        `shakaplayer: loading with ${content.drm_scheme} and ${content.drm_license_uri} and ${signal_secure}`,
-      );
+      console.log('shakaplayer: applying media security configuration');
 
       // For some reason, shaka does not like to use drm_scheme as a key for the map passed as object to configure call.
       // We are forced to create the map and then pass to configure call as in below.
@@ -470,12 +457,10 @@ export class ShakaPlayer implements PlayerInterface {
   }
   seekBack(): void {
     const time = this.mediaElement.currentTime;
-    console.log('shakaplayer: seekBack to ', time - 10);
     this.mediaElement.currentTime = time - 10;
   }
   seekFront(): void {
     const time = this.mediaElement.currentTime;
-    console.log('shakaplayer: seekFront to ', time + 10);
     this.mediaElement.currentTime = time + 10;
   }
 

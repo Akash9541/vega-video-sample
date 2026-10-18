@@ -5,6 +5,7 @@ import {
   VIDEO_FORMATS,
   VIDEO_URLS,
 } from '../../constants/videoConstants';
+import { FLINCH_SCREENED_MEDIA_ID } from '../../flinch/safetyCues';
 import { TitleData } from '../../types/TitleData';
 import { REF_APPS_ASSETS_DOMAIN } from '../../utils/videoPlayerValues';
 import {
@@ -213,7 +214,7 @@ export const getTrends = (): TitleData[] => [
 /** Localhost-only development fixture; excluded from the regular Trends row. */
 export const getFlinchTestVideos = (): TitleData[] => [
   {
-    id: 'flinch-test-video',
+    id: FLINCH_SCREENED_MEDIA_ID,
     title: 'Flinch Test Video',
     description: 'Local development test clip for Flinch cue playback.',
     mediaType: 'video',
@@ -221,12 +222,12 @@ export const getFlinchTestVideos = (): TitleData[] => [
     duration: 10,
     thumbnail: tile01,
     posterUrl: tile01,
-    uri: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    uri: 'http://127.0.0.1:8081/test-flashes-h264.mp4',
     categories: ['Flinch Test'],
     channelID: 'flinch-test',
     format: VIDEO_FORMATS.MP4,
     uhd: false,
-    secure: true,
+    secure: false,
     rentAmount: '0',
   },
 ];

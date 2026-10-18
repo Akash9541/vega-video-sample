@@ -8,6 +8,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { isContentPersonalizationEnabled } from '../../config/AppConfig';
 import { getMockPlaybackEventForVideo } from '../../personalization/mock/ContentPersonalizationMocks';
 import { areComponentPropsEqual } from '../../utils/lodashHelper';
+import { shouldReportPlaybackEvent } from '../../flinch/safetyCues';
 import { PLAYER_BUTTON_SIZE } from '../../utils/videoPlayerValues';
 import PlayerButton from './PlayerButton';
 import PlayPauseButton from './PlayPauseButton';
@@ -16,6 +17,7 @@ const DEFAULT_SEEK_TIME = 10;
 
 export interface PlaybackControlsProps {
   videoRef: React.MutableRefObject<VideoPlayer | null>;
+  mediaId?: string;
   onBlur?: () => void;
   playerControlType?: string;
 }
@@ -59,7 +61,7 @@ export const throttleSeek = (func: () => void, delay: number) => {
   }
 };
 
-const PlaybackControls = ({ videoRef }: PlaybackControlsProps) => {
+const PlaybackControls = ({ videoRef, mediaId = '' }: PlaybackControlsProps) => {
   const playPauseRef = useRef<any>(null);
   const skipBackwardRef = useRef<React.ComponentRef<typeof TouchableOpacity>>(null);
   const skipForwardRef = useRef<React.ComponentRef<typeof TouchableOpacity>>(null);
@@ -84,23 +86,18 @@ const PlaybackControls = ({ videoRef }: PlaybackControlsProps) => {
       seekBackward(videoRef);
     }, 500);
     try {
-      if (isContentPersonalizationEnabled()) {
+      if (shouldReportPlaybackEvent(mediaId, isContentPersonalizationEnabled())) {
         const playbackEvent = getMockPlaybackEventForVideo(
           videoRef,
           videoRef.current!.currentSrc,
           PlaybackState.PLAYING,
         );
         ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-        console.log(
-          `k_content_per: Seek Backwards : Reporting new playback event : ${JSON.stringify(
-            playbackEvent,
-          )}`,
-        );
       }
-    } catch (e) {
-      console.error(`k_content_per: ${e}`);
+    } catch {
+      console.error('Unable to report playback event.');
     }
-  }, [videoRef]);
+  }, [mediaId, videoRef]);
 
   const handleSeekForward = useCallback(() => {
     console.info('k_content_per: calling seekForward');
@@ -108,23 +105,18 @@ const PlaybackControls = ({ videoRef }: PlaybackControlsProps) => {
       seekForward(videoRef);
     }, 500);
     try {
-      if (isContentPersonalizationEnabled()) {
+      if (shouldReportPlaybackEvent(mediaId, isContentPersonalizationEnabled())) {
         const playbackEvent = getMockPlaybackEventForVideo(
           videoRef,
           videoRef.current!.currentSrc,
           PlaybackState.PLAYING,
         );
         ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-        console.log(
-          `k_content_per: Seek Forwards : Reporting new playback event : ${JSON.stringify(
-            playbackEvent,
-          )}`,
-        );
       }
-    } catch (e) {
-      console.error(`k_content_per: ${e}`);
+    } catch {
+      console.error('Unable to report playback event.');
     }
-  }, [videoRef]);
+  }, [mediaId, videoRef]);
   return (
     <View style={styles.playbackControls}>
       <PlayerButton
@@ -139,6 +131,7 @@ const PlaybackControls = ({ videoRef }: PlaybackControlsProps) => {
 
       <PlayPauseButton
         videoRef={videoRef}
+        mediaId={mediaId}
         hasTVPreferredFocus
         onBlur={onBlurPlayPause}
         size={PLAYER_BUTTON_SIZE}
@@ -160,7 +153,10 @@ export const arePlaybackControlsPropsEqual = (
   prevProps: PlaybackControlsProps,
   nextProps: PlaybackControlsProps,
 ) => {
-  return areComponentPropsEqual(prevProps.videoRef, nextProps.videoRef);
+  return (
+    areComponentPropsEqual(prevProps.videoRef, nextProps.videoRef) &&
+    prevProps.mediaId === nextProps.mediaId
+  );
 };
 export default React.memo(PlaybackControls, arePlaybackControlsPropsEqual);
 

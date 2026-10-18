@@ -15,5 +15,24 @@ exports[`PlayerScreen rendering Test Cases renders correctly screenshot match 1`
     ]
   }
   testID="touchable-opacity"
-/>
+>
+  <Text
+    pointerEvents="none"
+    style={
+      {
+        "backgroundColor": "#20242BCC",
+        "borderRadius": 6,
+        "color": "#FFFFFF",
+        "fontSize": 16,
+        "left": 24,
+        "paddingHorizontal": 12,
+        "paddingVertical": 8,
+        "position": "absolute",
+        "top": 24,
+      }
+    }
+  >
+    No screening data is bundled for this video.
+  </Text>
+</View>
 `;

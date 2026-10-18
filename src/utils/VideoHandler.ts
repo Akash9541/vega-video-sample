@@ -122,10 +122,7 @@ export class VideoHandler {
   preBufferVideo = useCallback(
     async (componentInstance?: IComponentInstance) => {
       await this.destroyVideoElements();
-      console.info(
-        '[VideoHandler.ts] - preBufferVideo - Attempt to prebuffer Video Player - ComponentInstance',
-        componentInstance,
-      );
+      console.info('[VideoHandler.ts] - Preparing media player');
       if (this.videoRef.current == null) {
         console.info(
           '[VideoHandler.ts] - preBufferVideo - Current video is null, create new Video Player',
@@ -153,8 +150,8 @@ export class VideoHandler {
             '[VideoHandler.ts] - preBufferVideo - KMC : Skipped setting KMC',
           );
         }
-      } catch (error) {
-        console.error('Error during KMC execution', error);
+      } catch {
+        console.error('Unable to configure media controls');
       }
 
       // Initialize the video player and set up content loading
@@ -168,11 +165,11 @@ export class VideoHandler {
           this.videoRef!!.current!!.autoplay = false;
           this.loadVideoElements();
         })
-        .catch((error) => {
+        .catch(() => {
           console.error(
             '[VideoHandler.ts] - preBufferVideo - Failed to initialize Video',
           );
-          console.error(error);
+          console.error('[VideoHandler.ts] - Video player initialization failed');
         });
     },
     [],
@@ -192,11 +189,10 @@ export class VideoHandler {
     if (this.videoRef !== null && this.videoRef.current !== null) {
       try {
         this.loadSubtitles();
-      } catch (error) {
+      } catch {
         console.error(
           '[VideoHandler.ts] - loadVideoElements - Failed to load subtitles',
         );
-        console.error(error);
       }
       this.videoRef.current.autoplay = false;
       this.videoRef.current.defaultSeekIntervalInSec = SKIP_INTERVAL_SECONDS;
@@ -227,9 +223,7 @@ export class VideoHandler {
     }) => {
       video.src = this.data.uri;
       video.pause();
-      console.log(
-        `[VideoHandler.ts] - loadStaticMediaPlayer - Loading static player with: ${video.src}`,
-      );
+      console.log('[VideoHandler.ts] - Loading static MP4 media');
       video.load();
     },
     [],
@@ -264,22 +258,14 @@ export class VideoHandler {
         if (this.player.current) {
           try {
             this.player.current.load(this.data, false);
-            console.log(
-              `[VideoHandler.ts] - loadStaticMediaPlayer - Loading Adaptive Media player (Shaka) with: ${this.data}`,
-            );
-          } catch (loadError) {
-            console.error(
-              '[VideoHandler.ts] - Error during Shaka player load:',
-              loadError,
-            );
+            console.log('[VideoHandler.ts] - Loading adaptive media');
+          } catch {
+            console.error('[VideoHandler.ts] - Adaptive media load failed');
             this.setIsVideoError(true);
           }
         }
-      } catch (error) {
-        console.error(
-          '[VideoHandler.ts] -Error initializing Shaka player:',
-          error,
-        );
+      } catch {
+        console.error('[VideoHandler.ts] - Adaptive player initialization failed');
         this.setIsVideoError(true);
       }
     } else {
@@ -299,9 +285,7 @@ export class VideoHandler {
     const source = this.data;
     if (source?.textTrack && source.textTrack.length > 0) {
       for (let i: number = 0; i < source.textTrack.length; i++) {
-        console.log(
-          `[VideoHandler.ts] - loadSubtitles - Loading subtitles from: ${source.uri} [${source.textTrack[i].language}]`,
-        );
+        console.log('[VideoHandler.ts] - Loading subtitle track');
         this.videoRef.current?.addTextTrack(
           'subtitles',
           source.textTrack[i].label,
@@ -377,19 +361,7 @@ export class VideoHandler {
       errorCategory = 'DECODE';
     }
 
-    // Log comprehensive error information
-    console.error(
-      '[VideoHandler.ts] - Streaming Error:\n' +
-        `Category: ${errorCategory}\n` +
-        `Format: ${this.selectedFileType}\n` +
-        `Position: ${target.mediaControlStateUtil?.currentPosition || 0}\n` +
-        `DRM Blocked: ${
-          target.decryptionBlockedOnKey_ || target.playbackBlockedOnKey_
-        }\n` +
-        `Has DRM Keys: ${!!target.mediaKeys}\n` +
-        `Details: ${errorMessage}\n` +
-        `uri: ${this.data?.uri}`,
-    );
+    console.error(`[VideoHandler.ts] - Media playback error category: ${errorCategory}`);
     this.setIsVideoError(true);
   };
 
@@ -572,8 +544,8 @@ export class VideoHandler {
 
       console.log('[VideoHandler.ts] - Sync destruction completed');
       return true;
-    } catch (err) {
-      console.error('[VideoHandler.ts] - Error during destruction: ', err);
+    } catch {
+      console.error('[VideoHandler.ts] - Media player cleanup failed');
       return false;
     }
   };

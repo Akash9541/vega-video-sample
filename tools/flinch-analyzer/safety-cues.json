@@ -1,0 +1,63 @@
+{
+  "analysis": {
+    "algorithmVersion": "1.1.0",
+    "durationSeconds": 10.0,
+    "flashWindowSeconds": 1.0,
+    "frameCount": 300,
+    "height": 240,
+    "limitations": [
+      "Global brightness can miss localized flashing regions.",
+      "Camera motion, cuts, and exposure changes can create candidates.",
+      "Sampling can miss events between sampled frames.",
+      "Candidates are not medical assessments or accessibility-standard evaluations."
+    ],
+    "method": "sampled_global_luminance_transitions",
+    "minDurationSeconds": 0.2,
+    "repetitionMinTransitions": 3,
+    "sampleFps": 15.0,
+    "sourceFps": 30.0,
+    "threshold": 0.2,
+    "width": 320
+  },
+  "cues": [
+    {
+      "action": "review",
+      "endSeconds": 4.0,
+      "evidence": {
+        "brightnessDifferences": [
+          0.6863,
+          -0.9922,
+          0.9922,
+          -0.9922,
+          0.9922,
+          -0.9922,
+          0.9922,
+          -0.9922,
+          0.9922,
+          -0.9922,
+          0.3059
+        ],
+        "directionReversals": 10,
+        "sampleFps": 15.0,
+        "transitionTimesSeconds": [
+          2.0,
+          2.2,
+          2.4,
+          2.6,
+          2.8,
+          3.0,
+          3.2,
+          3.4,
+          3.6,
+          3.8,
+          4.0
+        ]
+      },
+      "severity": "unclassified",
+      "startSeconds": 1.933,
+      "type": "candidate_flashing_pattern"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": "automated_screening"
+}

@@ -8,16 +8,18 @@ import { TouchableOpacity } from 'react-native';
 import { isContentPersonalizationEnabled } from '../../config/AppConfig';
 import { getMockPlaybackEventForVideo } from '../../personalization/mock/ContentPersonalizationMocks';
 import PlayerButton from './PlayerButton';
+import { shouldReportPlaybackEvent } from '../../flinch/safetyCues';
 
 export interface PlayPauseButtonProps {
   videoRef: React.MutableRefObject<VideoPlayer | null>;
+  mediaId?: string;
   onBlur?: () => void;
   hasTVPreferredFocus?: boolean;
   size: number;
 }
 const PlayPauseButton = React.forwardRef(
   (
-    { videoRef, onBlur, hasTVPreferredFocus, size }: PlayPauseButtonProps,
+    { videoRef, mediaId = '', onBlur, hasTVPreferredFocus, size }: PlayPauseButtonProps,
     ref: React.ForwardedRef<React.ComponentRef<typeof TouchableOpacity>>,
   ) => {
     const initalPlayingState =
@@ -64,46 +66,34 @@ const PlayPauseButton = React.forwardRef(
       videoRef?.current?.pause();
 
       try {
-        if (isContentPersonalizationEnabled()) {
-          console.info('k_content_per: Creating playbackEvent object in pause');
+        if (shouldReportPlaybackEvent(mediaId, isContentPersonalizationEnabled())) {
           const playbackEvent = getMockPlaybackEventForVideo(
             videoRef,
             videoRef.current!.currentSrc,
             PlaybackState.PAUSED,
           );
           ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-          console.log(
-            `k_content_per: Pause : Reporting new playback event :${JSON.stringify(
-              playbackEvent,
-            )}`,
-          );
         }
-      } catch (e) {
-        console.error(`k_content_per: ${e}`);
+      } catch {
+        console.error('Unable to report playback event.');
       }
-    }, [videoRef]);
+    }, [mediaId, videoRef]);
 
     const play = useCallback(() => {
       videoRef?.current?.play();
       try {
-        if (isContentPersonalizationEnabled()) {
-          console.info('k_content_per: Creating playbackEvent object in play');
+        if (shouldReportPlaybackEvent(mediaId, isContentPersonalizationEnabled())) {
           const playbackEvent = getMockPlaybackEventForVideo(
             videoRef,
             videoRef.current!.currentSrc,
             PlaybackState.PLAYING,
           );
           ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-          console.log(
-            `k_content_per: Play: Reporting new playback event : ${JSON.stringify(
-              playbackEvent,
-            )}`,
-          );
         }
-      } catch (e) {
-        console.error(`k_content_per: ${e}`);
+      } catch {
+        console.error('Unable to report playback event.');
       }
-    }, [videoRef]);
+    }, [mediaId, videoRef]);
     return (
       <PlayerButton
         onPress={playing ? pause : play}

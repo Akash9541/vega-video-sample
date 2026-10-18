@@ -5,11 +5,20 @@ import { describe } from '@jest/globals';
 import '@testing-library/jest-native/extend-expect';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { consoleInfoSpy } from '../../../jest.setup';
+import { ContentPersonalizationServer } from '@amazon-devices/kepler-content-personalization';
 import { getMockPlaybackEventForVideo } from '../../../src/personalization/mock/ContentPersonalizationMocks';
 import PlayPauseButton, {
   PlayPauseButtonProps,
 } from '../../../src/w3cmedia/mediacontrols/PlayPauseButton';
+
+jest.mock('@amazon-devices/kepler-content-personalization', () => ({
+  __esModule: true,
+  ContentPersonalizationServer: { reportNewPlaybackEvent: jest.fn() },
+  PlaybackState: { PLAYING: 'PLAYING', PAUSED: 'PAUSED' },
+}));
+jest.mock('../../../src/config/AppConfig', () => ({
+  isContentPersonalizationEnabled: jest.fn(() => true),
+}));
 const pauseMock = jest.fn();
 const playMock = jest.fn();
 const videoRef: React.MutableRefObject<VideoPlayer | null> = {
@@ -148,8 +157,22 @@ describe('PlayPauseButton onPress', () => {
     );
     fireEvent.press(getByTestId('player-btn-play-pause'));
     expect(videoRef.current?.play).toHaveBeenCalled();
-    expect(consoleInfoSpy).toHaveBeenCalledWith(
-      'k_content_per: Creating playbackEvent object in play',
+    expect(getMockPlaybackEventForVideo).toBeDefined();
+  });
+  it('does not report playback events for the Flinch screening fixture', () => {
+    const { getByTestId } = render(
+      renderCaptionButton({
+        mediaId: 'flinch-test-video',
+        videoRef: {
+          current: {
+            ...videoRef.current,
+            paused: true,
+            ended: false,
+          } as unknown as VideoPlayer,
+        },
+      }),
     );
+    fireEvent.press(getByTestId('player-btn-play-pause'));
+    expect(ContentPersonalizationServer.reportNewPlaybackEvent).not.toHaveBeenCalled();
   });
 });

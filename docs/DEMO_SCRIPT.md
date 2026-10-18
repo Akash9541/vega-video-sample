@@ -8,7 +8,7 @@ This version presents the implementation and its automated evidence. It does not
 
 ## 0:25–0:55 — Show the workflow
 
-Show the analyzer command and the active `src/flinch/safety-cues.json` manifest. Explain that Python, OpenCV, and NumPy sample global grayscale brightness offline. The generated manifest is bundled into the React Native/TypeScript Vega app; the app uses media time to choose which cue is active. Mention that the synthetic demo cue is kept in a separate manifest.
+Show `tools/flinch-analyzer/analyze_flashing.py` and the active `src/flinch/safety-cues.json` manifest. Explain that Python, OpenCV, and NumPy sample global grayscale brightness offline. The generated manifest is bundled into the React Native/TypeScript Vega app; the app uses media time to choose which cue is active. Mention that the synthetic demo cue is kept in a separate manifest.
 
 ## 0:55–1:30 — Show what the app is set up to do
 
@@ -18,7 +18,7 @@ If presenting on a working Vega device, replace this section with a recording or
 
 ## 1:30–2:10 — Report the evaluation honestly
 
-Show the seven-clip synthetic evaluation summary: six expected outcomes matched, no missed expected clips, and three false-positive isolated brightness-change cues on the ordinary-scene-cut clip. Repeated-pattern interval IoU was 0.9676 for the reference clip, 0.9835 for slow alternation, and 0.9227 for short alternation; detections started 0.067 seconds early and ended at the labeled end in these cases.
+Show `tools/flinch-analyzer/evaluation-results.md`: six of seven expected outcomes matched, no expected candidate clips were missed, and three false-positive isolated brightness-change cues occurred on the ordinary-scene-cut clip. Repeated-pattern interval IoU was 0.9676 for the reference clip, 0.9835 for slow alternation, and 0.9227 for short alternation; detections started 0.067 seconds early and ended at the labeled end in these cases.
 
 Explain that repeated-pattern candidates and isolated brightness transitions are separately typed and worded. Scene cuts can still produce isolated review cues because the method has no scene semantics.
 

@@ -1,0 +1,13 @@
+{
+  "evaluationVersion": 1,
+  "description": "Programmatically generated grayscale clips; expected labels describe global-brightness candidates, not medical hazard.",
+  "clips": [
+    {"id":"repeat_reference", "file":"test-flashes.mp4", "generation":"existing create_test_video.py fixture", "expected":"candidate_flashing_pattern", "groundTruthInterval":[2.0,4.0]},
+    {"id":"single_transition", "file":"single-transition.mp4", "generation":"stable 40/255 then abrupt 220/255 at 3s", "expected":"candidate_brightness_change", "expectedTransitionSeconds":[3.0]},
+    {"id":"gradual_ramp", "file":"gradual-ramp.mp4", "generation":"linear grayscale ramp from 40/255 to 220/255 over 8s", "expected":"no_candidate", "groundTruthInterval":null},
+    {"id":"stable_gray", "file":"stable-gray.mp4", "generation":"constant 80/255 for 8s", "expected":"no_candidate", "groundTruthInterval":null},
+    {"id":"ordinary_scene_cuts", "file":"ordinary-scene-cuts.mp4", "generation":"four steady textured grayscale scenes with global means 60, 220, 80, 200; cuts at 2, 4, and 6s", "expected":"no_candidate", "expectedTransitionSeconds":[2.0,4.0,6.0]},
+    {"id":"slow_alternation", "file":"slow-alternation.mp4", "generation":"alternating 20/240 every 0.5s from 2s through 6s", "expected":"candidate_flashing_pattern", "groundTruthInterval":[2.0,6.0]},
+    {"id":"short_alternation", "file":"short-alternation.mp4", "generation":"alternating 20/240 every 0.2s from 2s through 2.8s", "expected":"candidate_flashing_pattern", "groundTruthInterval":[2.0,2.8]}
+  ]
+}

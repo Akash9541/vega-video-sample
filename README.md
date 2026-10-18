@@ -6,30 +6,31 @@ Flinch addresses the difficulty of reviewing long videos for repeated, high-cont
 
 ### Workflow and implementation
 
-The separate analyzer at `~/flinch-analyzer/` uses Python, OpenCV, and NumPy to sample frames and measure each frame's global grayscale mean. It records sufficiently large adjacent-sample changes, groups repeated direction reversals within a time window as `candidate_flashing_pattern`, and leaves ungrouped changes as `candidate_brightness_change`. Both are unclassified review findings. A scene cut that changes the frame-wide mean can look like a brightness transition to this method.
+The offline analyzer in [`tools/flinch-analyzer/`](tools/flinch-analyzer/README.md) uses Python, OpenCV, and NumPy to sample frames and measure each frame's global grayscale mean. It records sufficiently large adjacent-sample changes, groups repeated direction reversals within a time window as `candidate_flashing_pattern`, and leaves ungrouped changes as `candidate_brightness_change`. Both are unclassified review findings. A scene cut that changes the frame-wide mean can look like a brightness transition to this method.
 
-The generated version 1 manifest is copied to `src/flinch/safety-cues.json` and bundled with the React Native/TypeScript Vega app. `PlayerScreen` resolves cue state from the current media position on `timeupdate`, `seeking`, `seeked`, `play`, `pause`, and `ended`. Repeated-pattern candidates and isolated changes have different presentation text. `src/flinch/synthetic-safety-cues.json` is a separate, clearly marked demo fixture and is not the active analyzer input. The analyzer test video is not bundled as a playback asset.
+The generated version 1 manifest is copied to `src/flinch/safety-cues.json` and bundled with the React Native/TypeScript Vega app. `PlayerScreen` resolves cue state from the current media position on `timeupdate`, `seeking`, `seeked`, `play`, `pause`, and `ended`. The bundled manifest is scoped to the development item with ID `flinch-test-video`; it is not applied to other sample titles. Repeated-pattern candidates and isolated changes have different presentation text. `src/flinch/synthetic-safety-cues.json` is a separate, clearly marked demo fixture and is not the active analyzer input. The analyzer test video is not bundled as a playback asset.
 
 ### Local workflow
 
-The analyzer and app are separate directories. Use the analyzer's existing `.venv` with OpenCV and NumPy installed. The companion analyzer does not currently include a dependency lock file, so its Python package versions are not pinned. In the app directory, `npm ci` installs the versions recorded in `package-lock.json`. Then run:
+The analyzer now lives in this repository so a clean checkout does not depend on a sibling `~/flinch-analyzer` directory. Use Node.js 22.14 or later for Vega React Native, Python 3.14 for the pinned analyzer environment, and the Vega SDK configured for the project. From the repository root:
 
 ```sh
-cd ~/flinch-analyzer
-source .venv/bin/activate
-python create_test_video.py
-python -m unittest discover -s tests -v
-python evaluate_flashing.py
-python analyze_flashing.py test-flashes.mp4 --output ~/projects/vega-video-sample/src/flinch/safety-cues.json
+python3.14 -m venv .venv-flinch
+. .venv-flinch/bin/activate
+python -m pip install -r tools/flinch-analyzer/requirements.txt
+python tools/flinch-analyzer/create_test_video.py
+python -m unittest discover -s tools/flinch-analyzer/tests -v
+python tools/flinch-analyzer/evaluate_flashing.py
+python tools/flinch-analyzer/evaluate_distinction_cases.py
+python tools/flinch-analyzer/analyze_flashing.py tools/flinch-analyzer/test-flashes.mp4 --output src/flinch/safety-cues.json
 
-cd ~/projects/vega-video-sample
 npm ci
 npm test -- --runInBand --coverage=false src/flinch/safetyCues.test.ts
 npm run typecheck
 npm run build:debug
 ```
 
-The fixture is a 10-second, 30-fps grayscale clip with stable brightness outside 2–4 seconds and alternating black/white frames during that interval. The analyzer options are `--sample-fps`, `--threshold`, `--min-duration`, `--repetition-min`, and `--flash-window`. Review the generated manifest before packaging it. `npm run build:debug` creates the aarch64 Debug package at `build/private/kepler/@amazon-devices/keplervideoapp/0.1/vega/aarch64/Debug/@amazon-devices/keplervideoapp_aarch64.vpkg` on this build configuration.
+The fixture is a 10-second, 30-fps grayscale clip with stable brightness outside 2–4 seconds and alternating black/white frames during that interval. Its H.264 playback copy is also included under `tools/flinch-analyzer/` as a development asset; neither file is bundled into the VPKG. To regenerate the H.264 copy after regenerating the analyzer input, run `ffmpeg -y -i tools/flinch-analyzer/test-flashes.mp4 -an -c:v libx264 -preset medium -crf 24 -pix_fmt yuv420p -movflags +faststart tools/flinch-analyzer/test-flashes-h264.mp4`. Serve the folder on loopback port 8081, for example with `python -m http.server 8081 --bind 127.0.0.1 --directory tools/flinch-analyzer`. The player fixture requests `/test-flashes-h264.mp4`. The analyzer options are `--sample-fps`, `--threshold`, `--min-duration`, `--repetition-min`, and `--flash-window`. Review the generated manifest before packaging it. `npm run build:debug` creates the aarch64 Debug package at `build/private/kepler/@amazon-devices/keplervideoapp/0.1/vega/aarch64/Debug/@amazon-devices/keplervideoapp_aarch64.vpkg` on this build configuration.
 
 In development builds, the Home screen shows a dedicated **Flinch Test Video** row first. Its localhost URL is a development-only fixture, not a production video source. Run the analyzer directory's HTTP server on port 8081 while using the virtual device; the device must be able to fetch `http://127.0.0.1:8081/test-flashes-h264.mp4`.
 
@@ -45,15 +46,27 @@ Use the device ID reported by `vega device list` for a physical device. On the c
 
 ### Preliminary synthetic evaluation
 
-The checked-in report at `~/flinch-analyzer/evaluation-results.md` evaluates seven generated clips for analyzer version 1.1.0. Six of seven expected outcomes matched, with no missed expected clips. Three false-positive `candidate_brightness_change` cues occurred on one ordinary-scene-cut clip whose expected label was no candidate. Repeated-pattern interval IoU was 0.9676 for the reference clip, 0.9835 for slow alternation, and 0.9227 for short alternation. Detected intervals started 0.067 s before the labeled start and ended at the labeled end for these cases. The single-transition, gradual-ramp, stable-gray, cut, slow-alternation, and short-alternation cases are summarized in the analyzer report.
+The checked-in report at [`tools/flinch-analyzer/evaluation-results.md`](tools/flinch-analyzer/evaluation-results.md) evaluates seven generated clips for analyzer version 1.1.0. Six of seven expected outcomes matched, with no missed expected clips. Three false-positive `candidate_brightness_change` cues occurred on one ordinary-scene-cut clip whose expected label was no candidate. Repeated-pattern interval IoU was 0.9676 for the reference clip, 0.9835 for slow alternation, and 0.9227 for short alternation. Detected intervals started 0.067 s before the labeled start and ended at the labeled end for these cases. The single-transition, gradual-ramp, stable-gray, cut, slow-alternation, and short-alternation cases are summarized in the analyzer report.
 
-This is a small synthetic check, not a representative video corpus or real-world accuracy estimate. The scene-cut result is a known limitation: the analyzer measures frame-wide brightness and has no scene understanding. Isolated changes are worded as isolated transitions and explicitly say they are not repeated-pattern findings; they can still appear as review cues.
+By clip, binary any-candidate counts are TP 4, FP 1, FN 0, TN 2 (precision 0.80, recall 1.00). This counts each expected cue type as a positive and does not measure cue-category correctness. This is a small synthetic check, not a representative video corpus or real-world accuracy estimate. The scene-cut result is a known limitation: the analyzer measures frame-wide brightness and has no scene understanding. Isolated changes are worded as isolated transitions and explicitly say they are not repeated-pattern findings; they can still appear as review cues.
+
+The five separate distinction cases are reproducible with `python tools/flinch-analyzer/evaluate_distinction_cases.py` and recorded in `tools/flinch-analyzer/distinction-results.json`. Four expected cue categories matched. The analyzer mislabeled repeated textured scene cuts as a repeated-pattern candidate. The low-amplitude candidate ended at 5.533 s for a 6.0 s labeled end; the adjacent-cut candidate began at 1.466 s for a 2.0 s labeled start (interval IoU 0.7893). These results show that the brightness-only method cannot reliably tell repeated scene changes from flashing and that nearby transitions can widen intervals. No thresholds were tuned from these results.
+
+### Security and privacy notes
+
+- Video analysis runs locally with Python, OpenCV, and NumPy. The analyzer does not upload video or frames. Its JSON contains measurements and timestamps, not source paths or video content. The current manifest has no source-video hash; app association is an explicit development fixture ID, so this is not yet a general per-video analysis system.
+- The app validates the entire bundled manifest before using it: supported schema/source/cue types, finite timestamps, intervals within the declared duration, bounded evidence arrays and metadata, and cue action consistency. Invalid data is treated as unavailable, not as an empty or safe result. Overlapping active cues resolve deterministically, with repeated-pattern candidates taking precedence over isolated changes.
+- The test MP4 is a local development asset served over loopback HTTP; it is not a production source and is not bundled. Do not expose the development server to an untrusted network.
+- Flinch playback events for the development fixture are excluded from the sample app's existing Content Personalization reporting. That platform integration remains enabled by existing app configuration for other titles on supported physical TVs. No new analytics, cloud service, or credentials were added.
+- Player logs no longer print media URLs, subtitle URLs, playback-event contents, decoder error text, or media position. The repository tracks `package-lock.json` for `npm ci`; analyzer packages are pinned in `tools/flinch-analyzer/requirements.txt`. No third-party secret-scanning tool is installed in this environment; a limited redacted-pattern scan found no matches.
 
 ### What is verified
 
-The focused Jest tests import the active analyzer-generated manifest and exercise the same pure cue resolver used by `PlayerScreen`, including start/end boundaries, seeking, pause/resume positions, playback end, and wording. The eight analyzer unit tests cover the Python analysis logic; the synthetic evaluation reports expected labels and interval overlap. Type checking and VPKG build/package inspection have also passed previously. These checks establish manifest and cue-state behavior, not visible rendering on a device.
+The full Jest suite most recently passed 64 suites (1 skipped), with 365 tests passed, 4 skipped, and all 57 snapshots passing. The focused Jest tests import the active analyzer-generated manifest and exercise the same pure cue resolver used by `PlayerScreen`, including start/end boundaries, seeking, pause/resume positions, playback end, wording, manifest rejection, overlap precedence, and media scoping. The 11 analyzer unit tests cover the Python analysis logic; the synthetic evaluation reports expected labels and interval overlap. Type checking and VPKG build/package inspection have also passed. These checks establish manifest and cue-state behavior, not visible rendering on a device.
 
-Device installation, app launch from the latest package, and visual playback of the warning remain unverified because the Vega virtual device is unavailable. A visual demo requires a working Vega display and screenshots or a recording showing playback position before 1.933 s, within the interval, and at or after 4.0 s, along with the package hash and device identity. Flinch is an offline review aid, not clinical validation or an accessibility certification.
+The latest device attempt in this environment reported `Virtual device ready`, but a subsequent status returned `running:false` and `qemu:-1`; `vega device list` found no device. Installation, app launch, and visual playback are therefore not verified in this run. A visual demo requires screenshots or a recording showing playback before 1.933 s, within the interval, and at or after 4.0 s, plus the package hash and device identity. Flinch is an offline review aid, not clinical validation or an accessibility certification.
+
+A current `npm audit --omit=dev --json` reports 85 findings (2 low, 29 moderate, 50 high, 4 critical). It no longer reports the old unscoped `xmldom@0.6.0`: that parser was reachable through Shaka's XML DOMParser fallback and is replaced by `@xmldom/xmldom@0.8.15`. [The xmldom maintainers' security policy](https://github.com/xmldom/xmldom/security) says the unscoped package is end-of-life. The four remaining critical records are React Native, `@react-native-community/cli`, `@react-native-community/cli-platform-android`, and `logkitty`; they trace to the React Native runtime and legacy code-generation/CLI dependencies. The nested `shell-quote` finding was resolved by pinning the 1.x dependency to 1.12.0, already used by the other consumers; the VPKG has no `node_modules` tree, and package inspection does not show those CLI programs as app assets. The `react-native` record is a production dependency; audit output alone does not establish that the vulnerable advisory-specific path is reachable in this Vega app. The 50 high records include React Native/Metro/Jest/codegen dependencies and Vega SDK packages attributed through `@amazon-devices/keplerscript-turbomodule-api`; several proposed fixes require major React Native or Vega SDK upgrades. Treat this as an unresolved dependency risk, not a clean bill of health. The app's current VPKG was not installed or run on a device in this verification. No broad upgrade was applied. See [the dependency audit notes](docs/DEPENDENCY_AUDIT.md) for the exact scope and caveats.
 
 The Vega Video Sample App is a comprehensive sample implementation showcasing how to build a production-ready streaming video app for Amazon Vega OS Fire TV Stick using the Vega Developer Tools. The Vega Video Sample App is a learning resource and a foundation for you to create your own Vega OS Fire TV Stick video streaming experiences.
 
@@ -81,9 +94,9 @@ Before you launch the sample app, make sure that you have:
 
 - [Vega Developer Tools](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html)
 - [Git v1.9 or later](https://git-scm.com/install/)
-- [Python v3.x](https://www.python.org/downloads/)
+- [Python 3.14](https://www.python.org/downloads/)
 - [Java Runtime Environment v21 or later](https://learn.microsoft.com/en-us/java/openjdk/download)
-- [NodeJS v18-v20](https://nodejs.org/en/download/)
+- [Node.js v22.14 or later](https://nodejs.org/en/download/)
 - A local web server, such as Apache. A local web server is required because browsers place restrictions on applications from file:/// URLs.
 
 **Note**: The Shaka Player integration runs automatically during `npm install` and requires these dependencies. If you encounter build errors related to Java or Python, install the missing prerequisites and run `npm install` again. For any other prerequisite Shaka issue please visit: https://shaka-project.github.io/shaka-player/docs/api/tutorial-welcome.html.

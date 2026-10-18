@@ -1,0 +1,205 @@
+{
+  "algorithmVersion": "1.1.0",
+  "evaluation": "synthetic-only, not real-world validation",
+  "results": [
+    {
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 3.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.7412
+            ],
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              3.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 2.933,
+          "type": "candidate_brightness_change"
+        }
+      ],
+      "description": "40 gray then 230 gray at 3s",
+      "detected": [
+        "candidate_brightness_change"
+      ],
+      "groundTruth": "candidate_brightness_change",
+      "id": "single_large_transition",
+      "match": true
+    },
+    {
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 4.533,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6275,
+              -0.6275,
+              0.6275,
+              -0.6275,
+              0.6275,
+              -0.5471
+            ],
+            "directionReversals": 5,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.533,
+              3.0,
+              3.533,
+              4.0,
+              4.533
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "description": "textured scenes at means 60/220/60/220/60/220; first scene 2s then cuts every 0.5s",
+      "detected": [
+        "candidate_flashing_pattern"
+      ],
+      "groundTruth": "candidate_brightness_change",
+      "id": "repeated_scene_cuts",
+      "match": false
+    },
+    {
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 6.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.6314,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.8627,
+              -0.8627,
+              0.2314
+            ],
+            "directionReversals": 8,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.533,
+              3.0,
+              3.533,
+              4.0,
+              4.533,
+              5.0,
+              5.533,
+              6.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "description": "gray 240/20 alternation every 0.5s, 2s-6s",
+      "detected": [
+        "candidate_flashing_pattern"
+      ],
+      "groundTruth": "candidate_flashing_pattern",
+      "id": "genuine_high_amplitude_alternation",
+      "match": true
+    },
+    {
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 5.533,
+          "evidence": {
+            "brightnessDifferences": [
+              0.2392,
+              -0.2196,
+              0.2196,
+              -0.2196,
+              0.2196,
+              -0.2196,
+              0.2196,
+              -0.2196
+            ],
+            "directionReversals": 7,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              2.0,
+              2.533,
+              3.0,
+              3.533,
+              4.0,
+              4.533,
+              5.0,
+              5.533
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.933,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "description": "gray 140/84 alternation every 0.5s, 2s-6s",
+      "detected": [
+        "candidate_flashing_pattern"
+      ],
+      "groundTruth": "candidate_flashing_pattern",
+      "id": "genuine_low_amplitude_alternation",
+      "match": true
+    },
+    {
+      "cues": [
+        {
+          "action": "review",
+          "endSeconds": 4.0,
+          "evidence": {
+            "brightnessDifferences": [
+              0.549,
+              -0.7451,
+              0.7451,
+              -0.7451,
+              0.7451,
+              -0.7451
+            ],
+            "directionReversals": 5,
+            "sampleFps": 15.0,
+            "transitionTimesSeconds": [
+              1.533,
+              2.0,
+              2.533,
+              3.0,
+              3.533,
+              4.0
+            ]
+          },
+          "severity": "unclassified",
+          "startSeconds": 1.466,
+          "type": "candidate_flashing_pattern"
+        }
+      ],
+      "description": "single transition at 1.5s immediately before 220/30 alternation from 2s-4s",
+      "detected": [
+        "candidate_flashing_pattern"
+      ],
+      "detectedInterval": [
+        1.466,
+        4.0
+      ],
+      "groundTruth": "candidate_flashing_pattern",
+      "groundTruthInterval": [
+        2.0,
+        4.0
+      ],
+      "id": "scene_cut_adjacent_to_pattern",
+      "iou": 0.7893,
+      "match": true,
+      "startErrorSeconds": -0.534
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import { DPADEventType, EVENT_KEY_DOWN } from '../../constants';
 import { getMockPlaybackEventForVideo } from '../../personalization/mock/ContentPersonalizationMocks';
 import { FrameImageSource } from '../../services/bif/FrameImageSource';
 import { COLORS } from '../../styles/Colors';
+import { shouldReportPlaybackEvent } from '../../flinch/safetyCues';
 import { TitleData } from '../../types/TitleData';
 import { areComponentPropsEqual } from '../../utils/lodashHelper';
 import ControlBar from './ControlBar';
@@ -160,19 +161,18 @@ export const VideoPlayerUI = React.memo(
                 break;
               }
             }
-          } catch (e) {
-            console.error(`k_content_per: ${e}`);
+          } catch {
+            console.error('Unable to create playback event.');
           }
         }
-        if (playbackEvent) {
-          if (isContentPersonalizationEnabled()) {
-            console.log(
-              `k_content_per: useTvEventHandler: Reporting new playback event : ${JSON.stringify(
-                playbackEvent,
-              )}`,
-            );
-            ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-          }
+        if (
+          playbackEvent &&
+          shouldReportPlaybackEvent(
+            videoData.id,
+            isContentPersonalizationEnabled(),
+          )
+        ) {
+          ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
         }
       }
     });
@@ -201,7 +201,7 @@ export const VideoPlayerUI = React.memo(
             <Header navigateBack={navigateBack} title={title} />
 
             {isRunningOnAutomotive() && (
-              <PlaybackControls videoRef={videoRef} />
+              <PlaybackControls videoRef={videoRef} mediaId={videoData.id} />
             )}
 
             <Seekbar

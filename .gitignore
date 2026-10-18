@@ -1,6 +1,5 @@
 # Build files
 node_modules
-package-lock.json
 
 # Other files
 *.iml
@@ -15,4 +14,10 @@ build/
 bundle/
 kepler-build/
 *.mp4
+__pycache__/
+.venv-flinch/
+!tools/flinch-analyzer/test-flashes.mp4
+!tools/flinch-analyzer/test-flashes-h264.mp4
 prepareRelease.sh
+package-lock.json
+buildinfo.json

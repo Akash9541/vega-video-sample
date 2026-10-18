@@ -33,13 +33,13 @@ Candidate-specific on-screen review wording
 
 ## Analyzer
 
-The analyzer is maintained separately in `~/flinch-analyzer/analyze_flashing.py`, not in this app repository. Its current algorithm version is 1.1.0. It samples frame-wide grayscale means, records changes whose absolute normalized difference meets the threshold, then groups neighboring transitions within `flash_window`. A group meeting the transition count and direction-reversal requirement can produce a `candidate_flashing_pattern`; transitions outside such a group produce `candidate_brightness_change` cues. Both use `severity: unclassified` and `action: review`.
+The analyzer is in `tools/flinch-analyzer/analyze_flashing.py`. Its current algorithm version is 1.1.0. It samples frame-wide grayscale means, records changes whose absolute normalized difference meets the threshold, then groups neighboring transitions within `flash_window`. A group meeting the transition count and direction-reversal requirement can produce a `candidate_flashing_pattern`; transitions outside such a group produce `candidate_brightness_change` cues. Both use `severity: unclassified` and `action: review`.
 
 The version 1 manifest includes analysis parameters, source video dimensions and duration, limitations, cue intervals, and transition evidence. Candidate intervals are generated offline; timestamps are rounded to milliseconds. Sampling and interval construction introduce timing imprecision. This method does not understand scene content, spatial extent, clinical risk, or accessibility standards.
 
 ## App integration
 
-`src/flinch/safety-cues.json` is the active analyzer-generated input imported by `src/flinch/safetyCues.ts`. The TypeScript contract validates version 1 cue intervals and has a safe empty fallback for malformed data. `getSafetyCueForMediaEvent` resolves the current media time and clears cue state on `ended`. `PlayerScreen` listens for media events and displays presentation text selected by cue type. The active cue interval is 1.933 seconds inclusive through 4.0 seconds exclusive.
+`src/flinch/safety-cues.json` is the active analyzer-generated input imported by `src/flinch/safetyCues.ts`. The TypeScript contract validates version 1 cue intervals and treats malformed data as unavailable. `getSafetyCueForMediaEvent` resolves the current media time and clears cue state on `ended`. `PlayerScreen` listens for media events and displays presentation text selected by cue type. The active cue interval is 1.933 seconds inclusive through 4.0 seconds exclusive.
 
 `src/flinch/synthetic-safety-cues.json` has source `synthetic_demo` and type `simulated_flash_risk`; it remains separate from the active app manifest. The generated `test-flashes.mp4` is used by the analyzer workflow and is not included as app playback media. Since the manifest is time-based, an in-app video needs to be available and long enough to demonstrate the interval.
 
@@ -51,7 +51,7 @@ The client is the existing Vega React Native application written in TypeScript. 
 build/private/kepler/@amazon-devices/keplervideoapp/0.1/vega/aarch64/Debug/@amazon-devices/keplervideoapp_aarch64.vpkg
 ```
 
-Python `unittest` checks analyzer behavior. `src/flinch/safetyCues.test.ts` uses Jest to check the shared resolver against the imported active manifest. TypeScript type checking checks app source. Build/package inspection confirms the manifest is bundled, but none of these checks confirms visible rendering. Device installation, launch, and visual playback remain unverified while the Vega device is unavailable.
+Python `unittest` checks analyzer behavior. `src/flinch/safetyCues.test.ts` uses Jest to check the shared resolver against the imported active manifest. TypeScript type checking checks app source. Build/package inspection confirms the manifest is bundled, but none of these checks confirms visible rendering. In the latest attempt the virtual device reported ready and then `running:false`, with no device listed; install, launch, and visual playback remain unverified.
 
 ## Known limits and next work
 

@@ -142,5 +142,8 @@
       "vega"
     ],
     "api": 0.1
+  },
+  "overrides": {
+    "shell-quote": "1.12.0"
   }
 }

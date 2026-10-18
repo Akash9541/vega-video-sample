@@ -99,6 +99,52 @@ describe('VideoHandler', () => {
     });
   });
 
+  describe('sensitive media data logging', () => {
+    it('does not log media URLs or decoder error details', () => {
+      const { videoHandler, mockSetIsVideoError } = createVideoHandler();
+      const privateUri = 'https://media.example/video.mp4?token=private-value';
+      videoHandler.data.uri = privateUri;
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const errorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const video = {
+        src: '',
+        autoplay: false,
+        pause: jest.fn(),
+        load: jest.fn(),
+      };
+
+      videoHandler.loadStaticMediaPlayer(video);
+      videoHandler.onError({
+        target: {
+          mediaControlStateUtil: {
+            currentPosition: 3.5,
+            mError: {
+              code_: 2,
+              message_: `Request failed for ${privateUri}`,
+            },
+          },
+          decryptionBlockedOnKey_: false,
+          playbackBlockedOnKey_: false,
+          mediaKeys: null,
+        },
+      });
+
+      const loggedText = [...logSpy.mock.calls, ...errorSpy.mock.calls]
+        .flat()
+        .join(' ');
+      expect(video.src).toBe(privateUri);
+      expect(loggedText).not.toContain(privateUri);
+      expect(loggedText).not.toContain('private-value');
+      expect(loggedText).not.toContain('3.5');
+      expect(mockSetIsVideoError).toHaveBeenCalledWith(true);
+
+      logSpy.mockRestore();
+      errorSpy.mockRestore();
+    });
+  });
+
   describe('destroyMediaPlayerSync', () => {
     it('should successfully destroy media player for MP4 content', () => {
       const { mockVideoRef, videoHandler } = createVideoHandler();

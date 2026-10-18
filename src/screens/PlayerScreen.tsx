@@ -1,7 +1,10 @@
 import {
+  FLINCH_SCREENED_MEDIA_ID,
   getSafetyCueForMediaEvent,
+  getSafetyCueManifestForMedia,
   getSafetyCuePresentation,
   SAFETY_CUE_MANIFEST,
+  shouldReportPlaybackEvent,
   SafetyCue,
 } from '../flinch/safetyCues';
 import {
@@ -72,6 +75,7 @@ const PlayerScreen = ({
   route,
 }: AppStackScreenProps<Screens.PLAYER_SCREEN>) => {
   const { data, onChannelTuneSuccess, onChannelTuneFailed } = route.params;
+  const safetyCueManifest = getSafetyCueManifestForMedia(data.id);
   const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
   const addKeplerAppStateListenerCallback = (
     eventType: KeplerAppStateEvent,
@@ -103,18 +107,22 @@ const PlayerScreen = ({
 
   const videoRef = useRef<VideoPlayer | null>(null);
   const checkSafetyCue = useCallback((event?: { type: string }) => {
+    if (!safetyCueManifest) {
+      setActiveSafetyCue(null);
+      return;
+    }
     const currentTime = videoRef.current?.currentTime;
     if (typeof currentTime !== 'number' || !Number.isFinite(currentTime)) {
       setActiveSafetyCue(null);
       return;
     }
     const cue = getSafetyCueForMediaEvent(
-      SAFETY_CUE_MANIFEST.cues,
+      safetyCueManifest.cues,
       currentTime,
       event?.type,
     );
     setActiveSafetyCue(cue ?? null);
-  }, []);
+  }, [safetyCueManifest]);
   const player = useRef<ShakaPlayer | null>(null);
   const bifFrameImagesRef = useRef<FrameImageSource | null>(null);
 
@@ -162,14 +170,8 @@ const PlayerScreen = ({
   }, [isVideoEnded]);
 
   useEffect(() => {
-    console.log(
-      '[PlayerScreen.tsx] - Initialize media player: componentInstance',
-      componentInstance,
-    );
-    console.log(
-      '[PlayerScreen.tsx] - Video Handler invoke preBufferVideo',
-      videoHandler.data,
-    );
+    console.log('[PlayerScreen.tsx] - Initialize media player');
+    console.log('[PlayerScreen.tsx] - Preparing selected media');
     videoHandler.preBufferVideo(componentInstance);
     setupEventListeners();
     const changeSubscription = addKeplerAppStateListenerCallback(
@@ -213,7 +215,7 @@ const PlayerScreen = ({
    * Function to report the video player screen exit.
    */
   const reportVideoExit = () => {
-    if (!isContentPersonalizationEnabled()) {
+    if (!shouldReportPlaybackEvent(data.id, isContentPersonalizationEnabled())) {
       return;
     }
 
@@ -227,15 +229,9 @@ const PlayerScreen = ({
         PlaybackState.EXIT,
       );
       ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-      console.info(
-        `[PlayerScreen.tsx] - reportVideoexit - k_content_per: Exit : Reporting new playback event :${JSON.stringify(
-          playbackEvent,
-        )}`,
-      );
-    } catch (e) {
-      console.error(
-        `[PlayerScreen.tsx] - reportVideoexit - k_content_per: ${e}`,
-      );
+      console.info('[PlayerScreen.tsx] - Reported playback exit event');
+    } catch {
+      console.error('[PlayerScreen.tsx] - Failed to report playback exit');
     }
   };
 
@@ -316,7 +312,7 @@ const PlayerScreen = ({
   }, [Platform.isTV]);
 
   const reportVideoPlaying = useCallback(() => {
-    if (!isContentPersonalizationEnabled()) {
+    if (!shouldReportPlaybackEvent(data.id, isContentPersonalizationEnabled())) {
       return;
     }
     try {
@@ -325,18 +321,12 @@ const PlayerScreen = ({
         videoRef.current!.currentSrc,
         PlaybackState.PLAYING,
       );
-      console.info(
-        `[PlayerScreen.tsx] - reportVideoPlaying -  k_content_per: Reported playback event : ${JSON.stringify(
-          playbackEvent,
-        )}`,
-      );
+      console.info('[PlayerScreen.tsx] - Reported playback event');
       ContentPersonalizationServer.reportNewPlaybackEvent(playbackEvent);
-    } catch (e) {
-      console.error(
-        `[PlayerScreen.tsx] - reportVideoPlaying -  k_content_per: ${e}`,
-      );
+    } catch {
+      console.error('[PlayerScreen.tsx] - Failed to report playback event');
     }
-  }, [videoRef]);
+  }, [videoRef, data.id]);
 
   useEffect(() => {
     if (videoPlayElapsedTimeM === 0) {
@@ -365,19 +355,13 @@ const PlayerScreen = ({
             .build();
         onChannelTuneSuccess(channelResponse);
       }
-      console.info(
-        '[PlayerScreen.tsx] - playVideo - k_content_per: Reporting new playback event',
-      );
       reportVideoPlaying();
-    } catch (error) {
-      console.error(
-        '[PlayerScreen.tsx] - playVideo - Error occurred while playing video {}',
-        error,
-      );
+    } catch {
+      console.error('[PlayerScreen.tsx] - Video playback could not start');
       if (onChannelTuneFailed) {
         onChannelTuneFailed(
           new OperationError(
-            `[PlayerScreen.tsx] - playVideo - Video content could not be played due to error ${error}`,
+            'Video content could not be played.',
           ),
         );
       }
@@ -441,9 +425,7 @@ const PlayerScreen = ({
     }
   };
   const onCaptionViewDestroyed = (captionsHandle: string): void => {
-    console.log(
-      `[PlayerScreen.tsx] - onCaptionViewDestroyed - Destroying captionsHandle=${captionsHandle}`,
-    );
+    console.log('[PlayerScreen.tsx] - Destroying caption view');
     if (videoRef.current !== null) {
       (videoRef.current as VideoPlayer).clearCaptionViewHandle(captionsHandle);
     }
@@ -494,13 +476,13 @@ const PlayerScreen = ({
           />
         )}
         {isVideoError && <ErrorView navigateBack={navigateBack} />}
-        {activeSafetyCue && (
+        {activeSafetyCue && safetyCueManifest && (
           <View style={styles.safetyWarning} pointerEvents="none">
             <Text style={styles.safetyWarningTitle}>
               {
                 getSafetyCuePresentation(
                   activeSafetyCue,
-                  SAFETY_CUE_MANIFEST.source,
+                  safetyCueManifest.source,
                 ).title
               }
             </Text>
@@ -508,7 +490,7 @@ const PlayerScreen = ({
               {
                 getSafetyCuePresentation(
                   activeSafetyCue,
-                  SAFETY_CUE_MANIFEST.source,
+                  safetyCueManifest.source,
                 ).body
               }
             </Text>
@@ -521,11 +503,22 @@ const PlayerScreen = ({
             </Text>
           </View>
         )}
-        {isVideoInitialized && SAFETY_CUE_MANIFEST.cues.length === 0 && (
+        {isVideoInitialized && !safetyCueManifest && (
           <Text style={styles.safetyEmptyState} pointerEvents="none">
-            No candidate cues in the bundled manifest
+            {data.id === FLINCH_SCREENED_MEDIA_ID
+              ? SAFETY_CUE_MANIFEST === null
+                ? 'Safety screening unavailable: the bundled manifest failed validation.'
+                : 'No screening data is available for this video.'
+              : 'No screening data is bundled for this video.'}
           </Text>
         )}
+        {isVideoInitialized &&
+          safetyCueManifest &&
+          safetyCueManifest.cues.length === 0 && (
+            <Text style={styles.safetyEmptyState} pointerEvents="none">
+              The bundled analysis emitted no candidate cues for this video.
+            </Text>
+          )}
       </View>
     </SafeAreaView>
   );
