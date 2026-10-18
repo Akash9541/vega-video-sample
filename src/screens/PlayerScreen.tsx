@@ -1,4 +1,10 @@
 import {
+  getSafetyCueForMediaEvent,
+  getSafetyCuePresentation,
+  SAFETY_CUE_MANIFEST,
+  SafetyCue,
+} from '../flinch/safetyCues';
+import {
   ChangeChannelStatus,
   ChannelServerComponent2,
   OperationError,
@@ -24,6 +30,7 @@ import {
 } from '@amazon-devices/react-native-w3cmedia';
 import isEqual from 'lodash/isEqual';
 import React, { useCallback, useEffect, useRef } from 'react';
+import { Text } from 'react-native';
 import ErrorView from '../components/ErrorView';
 import { focusManager } from '../utils/FocusManager';
 
@@ -88,11 +95,26 @@ const PlayerScreen = ({
   };
   const [isVideoEnded, setVideoEnded] = React.useState<boolean>(false);
   const [isVideoError, setVideoError] = React.useState<boolean>(false);
+  const [activeSafetyCue, setActiveSafetyCue] =
+    React.useState<SafetyCue | null>(null);
   const [videoPlayElapsedTimeM, setVideoPlayElapsedTimeM] =
     React.useState<number>(0);
   const timer = useRef<null | ReturnType<typeof setTimeout> | number>(null);
 
   const videoRef = useRef<VideoPlayer | null>(null);
+  const checkSafetyCue = useCallback((event?: { type: string }) => {
+    const currentTime = videoRef.current?.currentTime;
+    if (typeof currentTime !== 'number' || !Number.isFinite(currentTime)) {
+      setActiveSafetyCue(null);
+      return;
+    }
+    const cue = getSafetyCueForMediaEvent(
+      SAFETY_CUE_MANIFEST.cues,
+      currentTime,
+      event?.type,
+    );
+    setActiveSafetyCue(cue ?? null);
+  }, []);
   const player = useRef<ShakaPlayer | null>(null);
   const bifFrameImagesRef = useRef<FrameImageSource | null>(null);
 
@@ -172,6 +194,20 @@ const PlayerScreen = ({
       setShowBuffering(false);
     }
   }, [isVideoError]);
+  useEffect(() => {
+    const media = videoRef.current;
+    if (!media) {
+      setActiveSafetyCue(null);
+      return;
+    }
+    const events = ['timeupdate', 'seeking', 'seeked', 'play', 'pause', 'ended'];
+    events.forEach(event => media.addEventListener(event, checkSafetyCue));
+    checkSafetyCue();
+    return () => {
+      events.forEach(event => media.removeEventListener(event, checkSafetyCue));
+      setActiveSafetyCue(null);
+    };
+  }, [checkSafetyCue, isVideoInitialized, data]);
 
   /**
    * Function to report the video player screen exit.
@@ -458,6 +494,38 @@ const PlayerScreen = ({
           />
         )}
         {isVideoError && <ErrorView navigateBack={navigateBack} />}
+        {activeSafetyCue && (
+          <View style={styles.safetyWarning} pointerEvents="none">
+            <Text style={styles.safetyWarningTitle}>
+              {
+                getSafetyCuePresentation(
+                  activeSafetyCue,
+                  SAFETY_CUE_MANIFEST.source,
+                ).title
+              }
+            </Text>
+            <Text style={styles.safetyWarningBody}>
+              {
+                getSafetyCuePresentation(
+                  activeSafetyCue,
+                  SAFETY_CUE_MANIFEST.source,
+                ).body
+              }
+            </Text>
+            <Text style={styles.safetyWarningDetail}>
+              {activeSafetyCue.startSeconds.toFixed(1)}–
+              {activeSafetyCue.endSeconds.toFixed(1)} seconds · unclassified
+            </Text>
+            <Text style={styles.safetyWarningDetail}>
+              Screening aid only. This is not a medical safety assessment.
+            </Text>
+          </View>
+        )}
+        {isVideoInitialized && SAFETY_CUE_MANIFEST.cues.length === 0 && (
+          <Text style={styles.safetyEmptyState} pointerEvents="none">
+            No candidate cues in the bundled manifest
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -472,6 +540,45 @@ const arePlayerPropsEqual = (
 export default React.memo(PlayerScreen, arePlayerPropsEqual);
 
 export const styles = StyleSheet.create({
+  safetyWarning: {
+    position: 'absolute',
+    top: 40,
+    left: 36,
+    right: 36,
+    paddingHorizontal: 24,
+    paddingVertical: 18,
+    backgroundColor: '#681E16',
+    borderColor: '#FFD166',
+    borderWidth: 3,
+    borderRadius: 10,
+    zIndex: 10,
+  },
+  safetyEmptyState: {
+    position: 'absolute',
+    top: 24,
+    left: 24,
+    color: '#FFFFFF',
+    fontSize: 16,
+    backgroundColor: '#20242BCC',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  safetyWarningTitle: {
+    color: '#FFFFFF',
+    fontSize: 25,
+    fontWeight: 'bold',
+  },
+  safetyWarningBody: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    marginTop: 8,
+  },
+  safetyWarningDetail: {
+    color: '#FFE8B0',
+    fontSize: 16,
+    marginTop: 6,
+  },
   captions: {
     width: '100%',
     height: '100%',

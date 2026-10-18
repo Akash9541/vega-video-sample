@@ -10,4 +10,9 @@ package-lock.json
 .vscode
 .tmp
 npm-debug.log
+coverage/
+build/
+bundle/
+kepler-build/
+*.mp4
 prepareRelease.sh

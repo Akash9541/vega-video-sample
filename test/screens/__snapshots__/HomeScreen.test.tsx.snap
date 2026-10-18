@@ -205,6 +205,82 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                         [
                           {
                             "categories": [
+                              "Flinch Test",
+                            ],
+                            "channelID": "flinch-test",
+                            "description": "Local development test clip for Flinch cue playback.",
+                            "duration": 10,
+                            "format": "MP4",
+                            "id": "flinch-test-video",
+                            "mediaSourceType": "url",
+                            "mediaType": "video",
+                            "posterUrl": undefined,
+                            "rentAmount": "0",
+                            "secure": false,
+                            "thumbnail": undefined,
+                            "title": "Flinch Test Video",
+                            "uhd": false,
+                            "uri": "http://127.0.0.1:8081/test-flashes-h264.mp4",
+                          },
+                        ]
+                      }
+                      firstElementRef={
+                        {
+                          "current": null,
+                        }
+                      }
+                      heading="Flinch Test Video"
+                      initialColumnsToRender={6}
+                      isLastItem={false}
+                      isPriorityRow={true}
+                      onTileFocus={[Function]}
+                      row={0}
+                      testID="flinch_test_video"
+                    />
+                  </View>
+                </RCTScrollView>
+              </View>
+              <View
+                index={1}
+                onLayout={[Function]}
+                style={
+                  {
+                    "flexDirection": "column",
+                    "height": undefined,
+                    "left": 0,
+                    "maxHeight": undefined,
+                    "maxWidth": undefined,
+                    "minHeight": undefined,
+                    "minWidth": undefined,
+                    "position": "absolute",
+                    "top": 0,
+                    "width": 0,
+                  }
+                }
+              >
+                <RCTScrollView
+                  contentContainerStyle={
+                    {
+                      "paddingHorizontal": 8,
+                    }
+                  }
+                  horizontal={true}
+                  nestedScrollEnabled={false}
+                  scrollEnabled={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  <View>
+                    <MovieCarousel
+                      cardDimensions={
+                        {
+                          "height": 375.5,
+                          "width": 252,
+                        }
+                      }
+                      data={
+                        [
+                          {
+                            "categories": [
                               "Hits",
                             ],
                             "channelID": "13455",
@@ -366,24 +442,21 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                           },
                         ]
                       }
-                      firstElementRef={
-                        {
-                          "current": null,
-                        }
-                      }
+                      firstElementRef={null}
                       heading="Latest Hits"
                       initialColumnsToRender={6}
                       isLastItem={false}
                       isPriorityRow={true}
                       onTileFocus={[Function]}
-                      row={0}
+                      reportFullyDrawn={[Function]}
+                      row={1}
                       testID="latest_hits"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={1}
+                index={2}
                 onLayout={[Function]}
                 style={
                   {
@@ -783,17 +856,16 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                       heading="Classics"
                       initialColumnsToRender={6}
                       isLastItem={false}
-                      isPriorityRow={true}
+                      isPriorityRow={false}
                       onTileFocus={[Function]}
-                      reportFullyDrawn={[Function]}
-                      row={1}
+                      row={2}
                       testID="classics"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={2}
+                index={3}
                 onLayout={[Function]}
                 style={
                   {
@@ -1213,14 +1285,14 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={2}
+                      row={3}
                       testID="recommendations"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={3}
+                index={4}
                 onLayout={[Function]}
                 style={
                   {
@@ -1376,14 +1448,14 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={3}
+                      row={4}
                       testID="premium_collection"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={4}
+                index={5}
                 onLayout={[Function]}
                 style={
                   {
@@ -1613,14 +1685,14 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={4}
+                      row={5}
                       testID="new_hits"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={5}
+                index={6}
                 onLayout={[Function]}
                 style={
                   {
@@ -1873,7 +1945,7 @@ exports[`HomeScreen renders correctly and matches snapshot 1`] = `
                       isLastItem={true}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={5}
+                      row={6}
                       testID="trends"
                     />
                   </View>
@@ -2013,6 +2085,77 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                         [
                           {
                             "categories": [
+                              "Flinch Test",
+                            ],
+                            "channelID": "flinch-test",
+                            "description": "Local development test clip for Flinch cue playback.",
+                            "duration": 10,
+                            "format": "MP4",
+                            "id": "flinch-test-video",
+                            "mediaSourceType": "url",
+                            "mediaType": "video",
+                            "posterUrl": undefined,
+                            "rentAmount": "0",
+                            "secure": false,
+                            "thumbnail": undefined,
+                            "title": "Flinch Test Video",
+                            "uhd": false,
+                            "uri": "http://127.0.0.1:8081/test-flashes-h264.mp4",
+                          },
+                        ]
+                      }
+                      firstElementRef={null}
+                      heading="Flinch Test Video"
+                      isLastItem={false}
+                      isPriorityRow={true}
+                      onTileFocus={[Function]}
+                      row={0}
+                      testID="flinch_test_video"
+                    />
+                  </View>
+                </RCTScrollView>
+              </View>
+              <View
+                index={1}
+                onLayout={[Function]}
+                style={
+                  {
+                    "flexDirection": "column",
+                    "height": undefined,
+                    "left": 0,
+                    "maxHeight": undefined,
+                    "maxWidth": undefined,
+                    "minHeight": undefined,
+                    "minWidth": undefined,
+                    "position": "absolute",
+                    "top": 0,
+                    "width": 0,
+                  }
+                }
+              >
+                <RCTScrollView
+                  contentContainerStyle={
+                    {
+                      "paddingHorizontal": 8,
+                    }
+                  }
+                  horizontal={true}
+                  nestedScrollEnabled={false}
+                  scrollEnabled={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  <View>
+                    <MovieCarousel
+                      cardDimensions={
+                        {
+                          "height": 375.5,
+                          "width": 252,
+                        }
+                      }
+                      data={
+                        [
+                          {
+                            "categories": [
                               "Hits",
                             ],
                             "channelID": "13455",
@@ -2179,14 +2322,15 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       isLastItem={false}
                       isPriorityRow={true}
                       onTileFocus={[Function]}
-                      row={0}
+                      reportFullyDrawn={[Function]}
+                      row={1}
                       testID="latest_hits"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={1}
+                index={2}
                 onLayout={[Function]}
                 style={
                   {
@@ -2585,17 +2729,16 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       firstElementRef={null}
                       heading="Classics"
                       isLastItem={false}
-                      isPriorityRow={true}
+                      isPriorityRow={false}
                       onTileFocus={[Function]}
-                      reportFullyDrawn={[Function]}
-                      row={1}
+                      row={2}
                       testID="classics"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={2}
+                index={3}
                 onLayout={[Function]}
                 style={
                   {
@@ -3014,14 +3157,14 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={2}
+                      row={3}
                       testID="recommendations"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={3}
+                index={4}
                 onLayout={[Function]}
                 style={
                   {
@@ -3176,14 +3319,14 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={3}
+                      row={4}
                       testID="premium_collection"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={4}
+                index={5}
                 onLayout={[Function]}
                 style={
                   {
@@ -3412,14 +3555,14 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       isLastItem={false}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={4}
+                      row={5}
                       testID="new_hits"
                     />
                   </View>
                 </RCTScrollView>
               </View>
               <View
-                index={5}
+                index={6}
                 onLayout={[Function]}
                 style={
                   {
@@ -3671,7 +3814,7 @@ exports[`HomeScreen with touch optimized UX renders correctly and matches snapsh
                       isLastItem={true}
                       isPriorityRow={false}
                       onTileFocus={[Function]}
-                      row={5}
+                      row={6}
                       testID="trends"
                     />
                   </View>

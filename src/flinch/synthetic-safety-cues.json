@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "source": "synthetic_demo",
+  "analysis": {
+    "algorithmVersion": "demo",
+    "sampleFps": 0,
+    "threshold": 0,
+    "minDurationSeconds": 0,
+    "durationSeconds": 40,
+    "limitations": [
+      "Synthetic demonstration cue; not a result from video analysis."
+    ]
+  },
+  "cues": [
+    {
+      "startSeconds": 10,
+      "endSeconds": 15,
+      "type": "simulated_flash_risk",
+      "severity": "unclassified",
+      "action": "show_warning"
+    }
+  ]
+}

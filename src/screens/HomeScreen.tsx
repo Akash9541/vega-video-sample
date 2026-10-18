@@ -80,7 +80,7 @@ import { getNewHits } from '../data/local/newHits';
 import { getPremiumCollection } from '../data/local/premiumCollection';
 import { getRecommendations } from '../data/local/recommendations';
 import { getRotator } from '../data/local/rotator';
-import { getTrends } from '../data/local/trends';
+import { getFlinchTestVideos, getTrends } from '../data/local/trends';
 import { tileData } from '../data/tileData';
 
 // Live TV functionality
@@ -112,7 +112,18 @@ const AutoRotatorData = getRotator();
  * - testID: Identifier for automated testing
  * - data: Function that returns the content for that row
  */
-const data: MovieGridData[] = [
+export const getHomeGridData = (
+  isDevelopmentBuild = __DEV__,
+): MovieGridData[] => [
+  ...(isDevelopmentBuild
+    ? [
+        {
+          heading: 'Flinch Test Video',
+          testID: 'flinch_test_video',
+          data: getFlinchTestVideos,
+        },
+      ]
+    : []),
   {
     heading: 'Latest Hits',
     testID: 'latest_hits',
@@ -144,6 +155,8 @@ const data: MovieGridData[] = [
     data: getTrends,
   },
 ];
+
+const data: MovieGridData[] = getHomeGridData();
 
 /**
  * Props interface for the HomeScreen component

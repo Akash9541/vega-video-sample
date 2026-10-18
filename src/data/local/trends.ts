@@ -209,3 +209,24 @@ export const getTrends = (): TitleData[] => [
     rentAmount: '200',
   },
 ];
+
+/** Localhost-only development fixture; excluded from the regular Trends row. */
+export const getFlinchTestVideos = (): TitleData[] => [
+  {
+    id: 'flinch-test-video',
+    title: 'Flinch Test Video',
+    description: 'Local development test clip for Flinch cue playback.',
+    mediaType: 'video',
+    mediaSourceType: 'url',
+    duration: 10,
+    thumbnail: tile01,
+    posterUrl: tile01,
+    uri: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+    categories: ['Flinch Test'],
+    channelID: 'flinch-test',
+    format: VIDEO_FORMATS.MP4,
+    uhd: false,
+    secure: true,
+    rentAmount: '0',
+  },
+];

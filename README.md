@@ -1,5 +1,60 @@
 # Vega Video Sample App
 
+## Flinch offline video screening demo
+
+Flinch addresses the difficulty of reviewing long videos for repeated, high-contrast global brightness changes. It runs analysis offline before playback and stores candidate intervals in a JSON manifest. The Vega app uses those precomputed timestamps to show an on-screen review cue while media time is inside an interval. It does not analyze video in real time or decide whether content is medically unsafe.
+
+### Workflow and implementation
+
+The separate analyzer at `~/flinch-analyzer/` uses Python, OpenCV, and NumPy to sample frames and measure each frame's global grayscale mean. It records sufficiently large adjacent-sample changes, groups repeated direction reversals within a time window as `candidate_flashing_pattern`, and leaves ungrouped changes as `candidate_brightness_change`. Both are unclassified review findings. A scene cut that changes the frame-wide mean can look like a brightness transition to this method.
+
+The generated version 1 manifest is copied to `src/flinch/safety-cues.json` and bundled with the React Native/TypeScript Vega app. `PlayerScreen` resolves cue state from the current media position on `timeupdate`, `seeking`, `seeked`, `play`, `pause`, and `ended`. Repeated-pattern candidates and isolated changes have different presentation text. `src/flinch/synthetic-safety-cues.json` is a separate, clearly marked demo fixture and is not the active analyzer input. The analyzer test video is not bundled as a playback asset.
+
+### Local workflow
+
+The analyzer and app are separate directories. Use the analyzer's existing `.venv` with OpenCV and NumPy installed. The companion analyzer does not currently include a dependency lock file, so its Python package versions are not pinned. In the app directory, `npm ci` installs the versions recorded in `package-lock.json`. Then run:
+
+```sh
+cd ~/flinch-analyzer
+source .venv/bin/activate
+python create_test_video.py
+python -m unittest discover -s tests -v
+python evaluate_flashing.py
+python analyze_flashing.py test-flashes.mp4 --output ~/projects/vega-video-sample/src/flinch/safety-cues.json
+
+cd ~/projects/vega-video-sample
+npm ci
+npm test -- --runInBand --coverage=false src/flinch/safetyCues.test.ts
+npm run typecheck
+npm run build:debug
+```
+
+The fixture is a 10-second, 30-fps grayscale clip with stable brightness outside 2–4 seconds and alternating black/white frames during that interval. The analyzer options are `--sample-fps`, `--threshold`, `--min-duration`, `--repetition-min`, and `--flash-window`. Review the generated manifest before packaging it. `npm run build:debug` creates the aarch64 Debug package at `build/private/kepler/@amazon-devices/keplervideoapp/0.1/vega/aarch64/Debug/@amazon-devices/keplervideoapp_aarch64.vpkg` on this build configuration.
+
+In development builds, the Home screen shows a dedicated **Flinch Test Video** row first. Its localhost URL is a development-only fixture, not a production video source. Run the analyzer directory's HTTP server on port 8081 while using the virtual device; the device must be able to fetch `http://127.0.0.1:8081/test-flashes-h264.mp4`.
+
+When a Vega device is available, check it and launch the package:
+
+```sh
+vega virtual-device status
+vega device list
+vega run-app build/private/kepler/@amazon-devices/keplervideoapp/0.1/vega/aarch64/Debug/@amazon-devices/keplervideoapp_aarch64.vpkg com.amazondeveloper.keplervideoapp.main --deviceId VirtualDevice
+```
+
+Use the device ID reported by `vega device list` for a physical device. On the current manifest, the repeated-pattern candidate is absent before **1.933 s**, active on **[1.933 s, 4.0 s)**, and cleared at or after **4.0 s**. The manifest is position-based, so any playable video long enough to reach that interval can exercise it; the synthetic analyzer fixture itself is not an in-app video source.
+
+### Preliminary synthetic evaluation
+
+The checked-in report at `~/flinch-analyzer/evaluation-results.md` evaluates seven generated clips for analyzer version 1.1.0. Six of seven expected outcomes matched, with no missed expected clips. Three false-positive `candidate_brightness_change` cues occurred on one ordinary-scene-cut clip whose expected label was no candidate. Repeated-pattern interval IoU was 0.9676 for the reference clip, 0.9835 for slow alternation, and 0.9227 for short alternation. Detected intervals started 0.067 s before the labeled start and ended at the labeled end for these cases. The single-transition, gradual-ramp, stable-gray, cut, slow-alternation, and short-alternation cases are summarized in the analyzer report.
+
+This is a small synthetic check, not a representative video corpus or real-world accuracy estimate. The scene-cut result is a known limitation: the analyzer measures frame-wide brightness and has no scene understanding. Isolated changes are worded as isolated transitions and explicitly say they are not repeated-pattern findings; they can still appear as review cues.
+
+### What is verified
+
+The focused Jest tests import the active analyzer-generated manifest and exercise the same pure cue resolver used by `PlayerScreen`, including start/end boundaries, seeking, pause/resume positions, playback end, and wording. The eight analyzer unit tests cover the Python analysis logic; the synthetic evaluation reports expected labels and interval overlap. Type checking and VPKG build/package inspection have also passed previously. These checks establish manifest and cue-state behavior, not visible rendering on a device.
+
+Device installation, app launch from the latest package, and visual playback of the warning remain unverified because the Vega virtual device is unavailable. A visual demo requires a working Vega display and screenshots or a recording showing playback position before 1.933 s, within the interval, and at or after 4.0 s, along with the package hash and device identity. Flinch is an offline review aid, not clinical validation or an accessibility certification.
+
 The Vega Video Sample App is a comprehensive sample implementation showcasing how to build a production-ready streaming video app for Amazon Vega OS Fire TV Stick using the Vega Developer Tools. The Vega Video Sample App is a learning resource and a foundation for you to create your own Vega OS Fire TV Stick video streaming experiences.
 
 ![App Preview](./docs/images/home-screen.png)

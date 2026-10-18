@@ -4,10 +4,12 @@ import { jest as jestGlobals } from '@jest/globals';
 import '@testing-library/jest-native/extend-expect';
 import * as ReactNative from 'react-native';
 
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import VideoTile from '../../src/components/VideoTile';
+import { getFlinchTestVideos } from '../../src/data/local/trends';
 import { TitleData } from '../../src/types/TitleData';
+import { useNavigation } from '@amazon-devices/react-navigation__native';
 
 jestGlobals.mock('../../src/components/navigation/AppStack', () => ({
   __esModule: true,
@@ -67,6 +69,7 @@ const createVideoTitle = (
 
 describe('VideoTile tests', () => {
   jestGlobals.useFakeTimers();
+  const navigationPush = jest.fn();
 
   // @ts-ignore ts(2540): Animated.timing is read-only, but we
   // must overwrite it to make it work for our test.
@@ -81,6 +84,10 @@ describe('VideoTile tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (useNavigation as jest.Mock).mockReturnValue({ push: navigationPush });
+    jest
+      .spyOn(require('../../src/config/AppConfig'), 'isContentPersonalizationEnabled')
+      .mockReturnValue(false);
   });
 
   it('should match the snapshot on first render', async () => {
@@ -88,5 +95,22 @@ describe('VideoTile tests', () => {
     const renderedTile = render(<VideoTile index={0} data={title} />);
 
     expect(renderedTile.toJSON()).toMatchSnapshot();
+  });
+
+  it('passes the Flinch test video unchanged to Details navigation', () => {
+    const flinchVideo = getFlinchTestVideos()[0];
+    const { getByTestId } = render(
+      <VideoTile index={0} data={flinchVideo} row={0} />,
+    );
+
+    fireEvent.press(getByTestId('cardflinch-test-video'));
+
+    expect(navigationPush).toHaveBeenCalledWith('Details', {
+      data: flinchVideo,
+      focusId: flinchVideo.id,
+    });
+    expect(navigationPush.mock.calls[0][1].data.uri).toBe(
+      'http://127.0.0.1:8081/test-flashes-h264.mp4',
+    );
   });
 });

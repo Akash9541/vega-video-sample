@@ -13,7 +13,7 @@ import {
   AppStackScreenProps,
   Screens,
 } from '../../src/components/navigation/types';
-import HomeScreen from '../../src/screens/HomeScreen';
+import HomeScreen, { getHomeGridData } from '../../src/screens/HomeScreen';
 import {
   getSelectedLocale,
   localeOptions,
@@ -98,6 +98,29 @@ describe('HomeScreen', () => {
   beforeEach(() => {
     mockDispatch = jest.fn();
     (useDispatch as unknown as jest.Mock).mockReturnValue(mockDispatch);
+  });
+
+  it('puts the Flinch fixture in a dedicated development-only first row', () => {
+    const developmentRows = getHomeGridData(true);
+    const flinchRow = developmentRows[0];
+
+    expect(flinchRow.heading).toBe('Flinch Test Video');
+    expect(flinchRow.testID).toBe('flinch_test_video');
+    expect(flinchRow.data()).toMatchObject([
+      {
+        id: 'flinch-test-video',
+        title: 'Flinch Test Video',
+        uri: 'http://127.0.0.1:8081/test-flashes-h264.mp4',
+        format: 'MP4',
+      },
+    ]);
+
+    const productionRows = getHomeGridData(false);
+    expect(
+      productionRows.some(row =>
+        row.data().some(video => video.id === 'flinch-test-video'),
+      ),
+    ).toBe(false);
   });
 
   afterAll(() => {
